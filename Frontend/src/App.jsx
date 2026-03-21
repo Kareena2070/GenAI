@@ -1,19 +1,17 @@
 import { RouterProvider } from "react-router-dom"
 import { routers } from "./app.routers.jsx"
-
+import { AuthProvider } from "./features/auth/services/auth.context.jsx"
 
 
 function App() {
 
   return (
-
     <>
-    <RouterProvider  router={routers}/>
-
-    <h1>Kareena Yadav</h1>
-    </>
-     
+    <AuthProvider>
+      <RouterProvider  router={routers}/>
+    </AuthProvider>
   
+    </>
   )
 }
 

@@ -1,12 +1,28 @@
+import { useState } from "react";
 import { useNavigate, Link } from "react-router";
+import { useAuth } from "../hooks/useAuth";
 
 const Register = ()=>{
-
     const navigate = useNavigate()
+    const [username, setUsername] = useState("")
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
 
-     const handleSumbit = (e)=>{
+    const {loading, handleRegister}= useAuth()
+
+     const handleSumbit = async(e)=>{
         e.preventDefault()
+        await handleRegister({username, email, password})
 
+        navigate('/')
+    }
+
+    if(loading){
+        return(
+            <main>
+                <h1 className="text-center">Loading...</h1>
+            </main>
+        )
     }
 
     return(
@@ -32,6 +48,8 @@ const Register = ()=>{
               id="name"
               name="name"
               placeholder="Enter your username"
+            //   onChange={(e)=>setUsername=(e.target.value)}
+            onChange={(e) => setUsername(e.target.value)}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
             />
           </div>
@@ -49,6 +67,8 @@ const Register = ()=>{
               id="email"
               name="email"
               placeholder="Enter your email"
+            //   onChange={(e)=>setEmail=(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
             />
           </div>
@@ -66,6 +86,8 @@ const Register = ()=>{
               id="password"
               name="password"
               placeholder="Enter your password"
+            //   onChange={(e)=>setPassword=(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
             />
           </div>
