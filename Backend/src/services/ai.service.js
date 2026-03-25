@@ -8,19 +8,6 @@ const ai = new GoogleGenAI({
 
 })
 
-// async function invokeGeminiAI() {
-//     try {
-//         const response = await ai.models.generateContent({
-//             model: "gemini-2.5-flash",
-//             contents: "Hello gemini ! explain what is interview ?"
-//         })
-
-//         console.log(response.text)
-//     } catch (error) {
-//         console.error("Gemini invocation failed:", error.message)
-//     }
-// }
-
 const interviewReportSchema = z.object({
     matchScore:z.number().describe("A score between 0 and 100 indicating how well the candidate's profile matches the job describe"),
 
@@ -45,7 +32,8 @@ const interviewReportSchema = z.object({
         day: z.number().describe("The day number in the preparation plan, starting from 1"),
         focus: z.string().describe("he main focus of this day in the preparation plan, e.g. data structures, system design, mock interviews etc."),
         task: z.string().describe("List of tasks to be done on this day to follow the preparation plan, e.g. read a specific book or article, solve a set of problems, watch a video etc.")
-    })).describe("A day-wise preparation plan for the candidate to follow in order to prepare for the interview effectively")
+    })).describe("A day-wise preparation plan for the candidate to follow in order to prepare for the interview effectively"),
+    title: z.string().describe("The title of the job for which the interview report is generated"),
 })
 
 async function generateInterviewReport({ resume, selfDescription, jobDescription }) {
@@ -56,18 +44,17 @@ async function generateInterviewReport({ resume, selfDescription, jobDescription
                     Job Description: ${jobDescription}`
 
     const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-3-flash-preview",
         contents: prompt,
         config: {
             responseMimeType: "application/json",
-            responseJsonSchema: zodToJsonSchema(interviewReportSchema),
+            responseSchema: zodToJsonSchema(interviewReportSchema),
         }
     })
 
-    console.log(JSON.parse(response.text))
+    // console.log(response.text)
+    return JSON.parse(response.text)
 
 }
 
 module.exports = generateInterviewReport
-
-// module.exports = invokeGeminiAI
