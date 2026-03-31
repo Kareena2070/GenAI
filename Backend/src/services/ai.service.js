@@ -9,7 +9,7 @@ const ai = new GoogleGenAI({
 })
 
 const interviewReportSchema = z.object({
-    matchScore:z.number().describe("A score between 0 and 100 indicating how well the candidate's profile matches the job describe"),
+    matchScore: z.number().describe("A score between 0 and 100 indicating how well the candidate's profile matches the job describe"),
 
     technicalQuestions: z.array(z.object({
         question: z.string().describe("The technical question can be asked in the interview"),
@@ -31,24 +31,43 @@ const interviewReportSchema = z.object({
     preparationPlan: z.array(z.object({
         day: z.number().describe("The day number in the preparation plan, starting from 1"),
         focus: z.string().describe("he main focus of this day in the preparation plan, e.g. data structures, system design, mock interviews etc."),
-        task: z.string().describe("List of tasks to be done on this day to follow the preparation plan, e.g. read a specific book or article, solve a set of problems, watch a video etc.")
+        task: z.array(z.string()).describe("List of tasks to be done on this day to follow the preparation plan, e.g. read a specific book or article, solve a set of problems, watch a video etc.")
     })).describe("A day-wise preparation plan for the candidate to follow in order to prepare for the interview effectively"),
     title: z.string().describe("The title of the job for which the interview report is generated"),
 })
 
 async function generateInterviewReport({ resume, selfDescription, jobDescription }) {
 
-    const prompt = `Generate an interview report for a candidate with the following details:
-                    Resume: ${resume}
-                    Self Description: ${selfDescription}
-                    Job Description: ${jobDescription}`
+    const prompt = `
+                Generate a COMPLETE interview report in STRICT JSON format.
+
+                STRICT RULES:
+                - DO NOT leave any array empty
+                - Generate:
+                - 5 technicalQuestions
+                - 5 behaviouralQuestions
+                - 3 skillGaps
+                - 7 preparationPlan days
+                - Each preparationPlan.task MUST be an array of strings
+                - Follow schema EXACTLY
+                - No placeholders
+                - No empty values
+
+                Return ONLY JSON.
+
+                Candidate:
+                Resume: ${resume}
+                Self Description: ${selfDescription}
+                Job Description: ${jobDescription}
+                `
 
     const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: "Gemini 2.5 Flash",
         contents: prompt,
         config: {
             responseMimeType: "application/json",
             responseSchema: zodToJsonSchema(interviewReportSchema),
+            temperature: 0.3 // more deterministic
         }
     })
 

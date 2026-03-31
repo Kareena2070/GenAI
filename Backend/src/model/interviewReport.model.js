@@ -76,7 +76,7 @@ const behavioralQuestionSchema = new mongoose.Schema({
 const skillGapSchema = new mongoose.Schema({
     skill:{
         type: String, 
-        enum: ["low", "medium", "high"],
+        // enum: ["low", "medium", "high"],
         required: [true, "Skill is required"]
     },
 
@@ -127,17 +127,21 @@ const interviewReportSchema = new mongoose.Schema({
         max:100,
     },
 
-    technicalQuestion: [technicalQuestionSchema],
+    technicalQuestions: [technicalQuestionSchema],
 
-    behavioralQuestion: [behavioralQuestionSchema],
+    behavioralQuestions: [behavioralQuestionSchema],
 
-    skillGap: [skillGapSchema],
+    skillGaps: [skillGapSchema],
 
-    preparationReport: [preparationReportSchema],
+    preparationPlan: [preparationReportSchema],
 
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "users"
+    },
+    title:{
+        type: String,
+        required: [true, "Job title is required"]
     }
 
 }, {
