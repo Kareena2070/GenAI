@@ -1,4 +1,36 @@
+import { useInterview } from "../hooks/useInterview";
+import { useState, useRef } from "react"
+import { useNavigate } from "react-router";
+
 const Home = () => {
+
+  const { loading, generateReport } = useInterview()
+  const [jobDescription, setJobDescription] = useState("")
+  const [selfDescription, setSelfDescription] = useState("")
+  const resumeFileRef = useRef()
+  const navigate = useNavigate()
+
+  const handleGenerateReport = async () => {
+    const resumeFile = resumeFileRef.current.files[0]
+    const data = await generateReport({jobDescription, selfDescription, resumeFile})
+
+    if (data?._id) {
+      navigate(`/interview/${data._id}`)
+    }
+  }
+
+  if(loading){
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-16 w-16 mb-4 mx-auto"></div>
+          <h2 className="text-xl font-semibold text-gray-700">Generating your interview strategy...</h2>
+          <p className="text-gray-500 mt-2">This may take a moment. Please wait.</p>
+        </div>
+      </div>
+    )
+  }
+
  return (
    <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 flex items-center justify-center p-4 md:p-10">
     
@@ -35,6 +67,7 @@ const Home = () => {
 
 
            <textarea
+              onChange={(e)=>{setJobDescription(e.target.value)}}
              placeholder="Paste the full job description here..."
              className="w-full h-64 md:h-80 border border-gray-200 rounded-xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 resize-none"
            />
@@ -67,7 +100,7 @@ const Home = () => {
                <p className="text-xs text-gray-400 mt-1">
                  PDF / DOCX (Max 5MB)
                </p>
-               <input type="file" id="resume" className="hidden" />
+               <input ref={resumeFileRef} type="file" id="resume" className="hidden" />
              </label>
            </div>
 
@@ -83,6 +116,7 @@ const Home = () => {
            {/* Self Description */}
            <div>
              <textarea
+              onChange={(e)=>{setSelfDescription(e.target.value)}}
                placeholder="Briefly describe your experience, skills, and goals..."
                className="w-full h-32 md:h-40 border border-gray-200 rounded-xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 resize-none"
              />
@@ -96,7 +130,9 @@ const Home = () => {
 
 
            {/* CTA Button */}
-           <button className="mt-2 w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 rounded-xl font-semibold hover:opacity-90 transition">
+           <button 
+            onClick={handleGenerateReport}
+           className="mt-2 w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 rounded-xl font-semibold hover:opacity-90 transition">
              Generate Interview Strategy
            </button>
          </div>
